@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Star, Search, Home, Heart, User, LogOut, AlertCircle, Phone, Briefcase, TrendingUp, Users, Calendar, X, Building, CheckCircle } from 'lucide-react';
+import { MapPin, Star, Search, Home, Heart, User, LogOut, AlertCircle, Phone, Briefcase, TrendingUp, Users, Calendar, X, Building, CheckCircle, Clock, BarChart2, Settings, Shield } from 'lucide-react';
 
 // --- Reusable UI Components ---
 
-// A more visually appealing card for displaying stats on dashboards
 const StatCard = ({ icon, label, value, color }) => {
   const colorClasses = {
     blue: { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-600', icon: 'text-blue-500' },
@@ -24,9 +23,10 @@ const StatCard = ({ icon, label, value, color }) => {
   );
 };
 
-// Main App Component
+// --- Main App Component ---
+
 export default function WorkSpaceAfrica() {
-  const BRAND_COLOR = '#0A65F1'; // A vibrant blue for primary actions
+  const BRAND_COLOR = '#0A65F1';
   const [activeTab, setActiveTab] = useState('discover');
   const [searchQuery, setSearchQuery] = useState('');
   const [spaces, setSpaces] = useState([]);
@@ -141,7 +141,7 @@ export default function WorkSpaceAfrica() {
     const newBooking = {
       id: 'BK' + Date.now(), userEmail: user.email, spaceId: selectedSpace.id,
       spaceName: selectedSpace.name, date: bookingDetails.date, hours: bookingDetails.hours,
-      totalPrice: selectedSpace.price * bookingDetails.hours, status: 'pending'
+      totalPrice: selectedSpace.price * bookingDetails.hours, status: 'Pending'
     };
     setBookings(prev => [newBooking, ...prev]);
     alert('Booking submitted! The space owner will contact you shortly.');
@@ -149,12 +149,19 @@ export default function WorkSpaceAfrica() {
     setSelectedSpace(null);
     setBookingDetails({ date: '', hours: 1 });
   };
+    
+  const updateBookingStatus = (bookingId, newStatus) => {
+      setBookings(currentBookings =>
+          currentBookings.map(b => b.id === bookingId ? { ...b, status: newStatus } : b)
+      );
+  };
 
   const filteredSpaces = spaces.filter(space =>
     space.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     space.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // --- Reusable Components ---
   const SpaceCard = ({ space }) => {
     const isFavorite = favorites.has(space.id);
     return (
@@ -226,7 +233,6 @@ export default function WorkSpaceAfrica() {
           </div>
         </div>
         <p className="text-gray-700 mb-5 leading-relaxed">{space.description}</p>
-
         {!showBookingModal ? (
           <div className="flex gap-3 sticky bottom-0 bg-white py-4 border-t border-gray-100 -mx-5 px-5">
             <button
@@ -236,7 +242,7 @@ export default function WorkSpaceAfrica() {
               <Heart fill={favorites.has(space.id) ? '#ef4444' : 'none'} className={favorites.has(space.id) ? 'text-red-500' : 'text-slate-400'} />
             </button>
             <button
-              onClick={() => user ? setShowBookingModal(true) : alert("Please log in to book a space.")}
+              onClick={() => user ? setShowBookingModal(true) : setActiveTab('profile')}
               style={{ backgroundColor: BRAND_COLOR }}
               className="flex-1 text-white font-bold py-3 rounded-xl hover:opacity-90 transition text-lg"
             >
@@ -270,6 +276,45 @@ export default function WorkSpaceAfrica() {
     </div>
   );
 
+  // --- DASHBOARDS ---
+
+  const UserDashboard = () => {
+    const userBookings = bookings.filter(b => b.userEmail === user.email);
+    const savedSpaces = spaces.filter(space => favorites.has(space.id));
+    return (
+        <div className="space-y-6 pb-20">
+            <div className="text-center">
+                <div className="w-24 h-24 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <User size={48} />
+                </div>
+                <h2 className="text-3xl font-bold text-gray-900">Welcome, {user.name}!</h2>
+                <p className="text-gray-600">{user.email}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+                <StatCard icon={<Calendar />} label="My Bookings" value={userBookings.length} color="blue" />
+                <StatCard icon={<Heart />} label="Saved Spaces" value={savedSpaces.length} color="orange" />
+            </div>
+            <div className="bg-white rounded-2xl p-5 shadow-sm">
+                <h3 className="font-bold text-gray-900 mb-4 text-lg flex items-center gap-2"><Clock size={20}/> My Recent Bookings</h3>
+                {userBookings.length > 0 ? (
+                    <div className="space-y-3">
+                        {userBookings.slice(0, 3).map(b => (
+                             <div key={b.id} className={`border-l-4 p-3 bg-blue-50/50 rounded-r-lg ${b.status === 'Confirmed' ? 'border-green-500' : b.status === 'Declined' ? 'border-red-500' : 'border-yellow-500'}`}>
+                                <p className="font-bold text-gray-800 text-sm">{b.spaceName}</p>
+                                <p className="text-xs text-gray-500 mt-1">{b.date} • {b.hours} hours</p>
+                                <p className={`text-xs font-bold mt-2 uppercase ${b.status === 'Confirmed' ? 'text-green-600' : b.status === 'Declined' ? 'text-red-600' : 'text-yellow-600'}`}>{b.status}</p>
+                            </div>
+                        ))}
+                    </div>
+                ) : <p className="text-gray-500 py-6 text-center text-sm">You haven't made any bookings yet.</p>}
+            </div>
+             <button onClick={handleLogout} className="w-full bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl hover:bg-slate-300 transition text-md flex items-center justify-center gap-2">
+                <LogOut size={18}/> Log Out
+            </button>
+        </div>
+    );
+  };
+
   const PartnerDashboard = () => {
     const partnerData = user;
     const stats = partnerStats[partnerData.spaceId] || {};
@@ -287,14 +332,21 @@ export default function WorkSpaceAfrica() {
           <StatCard icon={<Users />} label="Inquiries" value={stats.newInquiries} color="orange" />
         </div>
         <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <h3 className="font-bold text-gray-900 mb-4 text-lg">Recent Bookings</h3>
+          <h3 className="font-bold text-gray-900 mb-4 text-lg flex items-center gap-2"><Clock size={20}/> Manage Bookings</h3>
           {partnerBookings.length > 0 ? (
             <div className="space-y-3">
-              {partnerBookings.slice(0, 5).map(b => (
-                <div key={b.id} className="border-l-4 border-blue-500 p-3 bg-blue-50/50 rounded-r-lg">
+              {partnerBookings.map(b => (
+                <div key={b.id} className="p-3 bg-slate-50 rounded-lg border">
                   <p className="font-bold text-gray-800 text-sm">{b.userEmail}</p>
-                  <p className="text-xs text-gray-500 mt-1">{b.date} • {b.hours} hours</p>
-                  <p className="text-md font-bold text-green-600 mt-1">₦{b.totalPrice.toLocaleString()}</p>
+                  <p className="text-xs text-gray-500 mt-1">{b.date} • {b.hours} hours • ₦{b.totalPrice.toLocaleString()}</p>
+                  {b.status === 'Pending' ? (
+                    <div className="flex gap-2 mt-3">
+                        <button onClick={() => updateBookingStatus(b.id, 'Confirmed')} className="flex-1 bg-green-100 text-green-700 text-xs font-bold py-2 rounded-md hover:bg-green-200">Confirm</button>
+                        <button onClick={() => updateBookingStatus(b.id, 'Declined')} className="flex-1 bg-red-100 text-red-700 text-xs font-bold py-2 rounded-md hover:bg-red-200">Decline</button>
+                    </div>
+                  ) : (
+                    <p className={`text-sm font-bold mt-2 uppercase ${b.status === 'Confirmed' ? 'text-green-600' : 'text-red-600'}`}>{b.status}</p>
+                  )}
                 </div>
               ))}
             </div>
@@ -307,6 +359,8 @@ export default function WorkSpaceAfrica() {
   const AdminDashboard = () => {
     const totalRevenue = Object.values(partnerStats).reduce((sum, stat) => sum + stat.monthlyRevenue, 0);
     const totalBookings = Object.values(partnerStats).reduce((sum, stat) => sum + stat.totalBookings, 0);
+    const totalUsers = new Set(bookings.map(b => b.userEmail)).size;
+
     return (
       <div className="space-y-6 pb-20">
         <div className="text-center">
@@ -314,29 +368,39 @@ export default function WorkSpaceAfrica() {
           <p className="text-gray-600">Real-time insights & performance metrics.</p>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <StatCard icon={<Calendar />} label="Total Bookings" value={totalBookings} color="blue" />
+          <StatCard icon={<Calendar />} label="Total Bookings" value={bookings.length} color="blue" />
           <StatCard icon={<TrendingUp />} label="Platform Revenue" value={`₦${(totalRevenue / 1000).toFixed(0)}k`} color="green" />
           <StatCard icon={<Building />} label="Active Spaces" value={spaces.length} color="purple" />
-          <StatCard icon={<Users />} label="Total Users" value={Object.keys(partners).length + 1} color="orange" />
+          <StatCard icon={<Users />} label="Active Users" value={totalUsers} color="orange" />
         </div>
         <div className="bg-white rounded-2xl p-5 shadow-sm">
-          <h3 className="font-bold text-gray-900 mb-4 text-lg">Partner Performance</h3>
-          {spaces.map(space => {
-            const stats = partnerStats[space.id];
-            return (
-              <div key={space.id} className="mb-3 p-4 bg-slate-50 rounded-xl border">
-                <p className="font-bold text-gray-800 text-md mb-2">{space.name}</p>
-                <div className="grid grid-cols-2 gap-2 text-center">
-                  <div className="bg-white p-2 rounded-lg"><p className="text-xs text-gray-500">Bookings</p><p className="font-bold text-blue-600">{stats.totalBookings}</p></div>
-                  <div className="bg-white p-2 rounded-lg"><p className="text-xs text-gray-500">Revenue</p><p className="font-bold text-green-600">₦{(stats.monthlyRevenue / 1000).toFixed(0)}k</p></div>
+          <h3 className="font-bold text-gray-900 mb-4 text-lg flex items-center gap-2"><Shield size={20}/> Manage Spaces</h3>
+          {spaces.map(space => (
+            <div key={space.id} className="mb-3 p-4 bg-slate-50 rounded-xl border flex justify-between items-center">
+                <div>
+                    <p className="font-bold text-gray-800 text-md">{space.name}</p>
+                    <p className="text-xs text-gray-500">{space.location}</p>
                 </div>
-              </div>
-            );
-          })}
+                <button className="text-xs bg-blue-100 text-blue-700 font-bold py-2 px-3 rounded-md hover:bg-blue-200">View</button>
+            </div>
+          ))}
+        </div>
+        <div className="bg-white rounded-2xl p-5 shadow-sm">
+            <h3 className="font-bold text-gray-900 mb-4 text-lg flex items-center gap-2"><Briefcase size={20}/> Manage Partners</h3>
+            {Object.entries(partners).map(([email, partner]) => (
+                 <div key={email} className="mb-3 p-4 bg-slate-50 rounded-xl border flex justify-between items-center">
+                    <div>
+                        <p className="font-bold text-gray-800 text-md">{partner.name}</p>
+                        <p className="text-xs text-gray-500">{email}</p>
+                    </div>
+                </div>
+            ))}
         </div>
       </div>
     );
   };
+  
+  // --- Render Logic ---
 
   const renderContent = () => {
     if (userRole === 'partner') return <PartnerDashboard />;
@@ -362,7 +426,7 @@ export default function WorkSpaceAfrica() {
         return (
           <div className="space-y-4 pb-20">
             {!user ? (
-                <div className="text-center py-16 text-gray-400"><User size={48} className="mx-auto mb-4" /><p className="text-lg font-semibold">Please log in</p><p>Sign in to see your saved spaces.</p></div>
+              <div className="text-center py-16 text-gray-400"><User size={48} className="mx-auto mb-4" /><p className="text-lg font-semibold">Please log in</p><p>Sign in to see your saved spaces.</p></div>
             ) : savedSpaces.length > 0 ? (
               savedSpaces.map(space => <SpaceCard key={space.id} space={space} />)
             ) : (
@@ -374,21 +438,12 @@ export default function WorkSpaceAfrica() {
             )}
           </div>
         );
+      case 'dashboard':
+        return user ? <UserDashboard /> : <div className="text-center py-16 text-gray-400"><p>Please log in to see your dashboard.</p></div>;
       case 'profile':
         return (
           <div className="pb-20">
-            {user ? (
-              <div className="space-y-4 text-center">
-                <div className="w-24 h-24 bg-blue-100 text-blue-500 rounded-full flex items-center justify-center mx-auto">
-                    <User size={48} />
-                </div>
-                <h2 className="text-2xl font-bold">{user.name}</h2>
-                <p className="text-gray-500">{user.email}</p>
-                <button onClick={handleLogout} className="w-full bg-slate-200 text-slate-800 font-bold py-3.5 rounded-xl hover:bg-slate-300 transition text-md">
-                  Log Out
-                </button>
-              </div>
-            ) : (
+            {user ? <UserDashboard /> : (
               <div className="space-y-4">
                 <div className="text-center">
                   <h2 className="text-3xl font-bold text-gray-900">{authMode === 'login' ? 'Welcome Back!' : 'Join Us'}</h2>
@@ -409,7 +464,8 @@ export default function WorkSpaceAfrica() {
                 <div className="p-4 bg-slate-50 rounded-xl border text-xs text-gray-600">
                   <p className="font-bold flex items-center gap-2 mb-2"><AlertCircle size={16} /> Demo Credentials</p>
                   <p><b className="font-semibold">Admin:</b> admin@workspace.com / admin</p>
-                  <p><b className="font-semibold">Partner:</b> francis@sebshub.com (no password needed)</p>
+                  <p><b className="font-semibold">Partner:</b> francis@sebshub.com (no password)</p>
+                  <p><b className="font-semibold">User:</b> any other email (no password)</p>
                 </div>
               </div>
             )}
@@ -457,7 +513,7 @@ export default function WorkSpaceAfrica() {
               {[
                 { id: 'discover', icon: Home, label: 'Discover' },
                 { id: 'saved', icon: Heart, label: 'Saved' },
-                { id: 'profile', icon: User, label: 'Profile' }
+                { id: 'profile', icon: User, label: 'Dashboard' }
               ].map(({ id, icon: Icon, label }) => (
                 <button
                   key={id}
@@ -491,3 +547,4 @@ export default function WorkSpaceAfrica() {
     </div>
   );
 }
+
