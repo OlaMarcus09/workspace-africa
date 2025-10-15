@@ -1,16 +1,107 @@
-# React + Vite
+WorkSpace Africa
+An intelligent, transactional marketplace for vetted coworking spaces in Africa.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<!--
+TODO: After your first Vercel deploy, come back and add your deployment badge here!
+You can get it from Vercel in your project settings. It will look something like this:
 
-Currently, two official plugins are available:
+-->
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🚀 The Vision
+WorkSpace Africa is the "Airbnb for coworking spaces," designed for the unique dynamics of the African market. We are a community-powered visibility engine that solves the critical problem of trust and discovery for a new generation of professionals.
 
-## React Compiler
+The Problem
+For Professionals: Finding a reliable workspace with guaranteed amenities like constant power and fast WiFi is a fragmented, time-consuming nightmare.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+For Space Owners: Thousands of valuable desks sit empty every day due to a lack of marketing reach and efficient booking tools.
 
-## Expanding the ESLint configuration
+The Solution
+WorkSpace Africa is a web-first application providing a seamless, end-to-end experience. Professionals can discover and instantly book vetted spaces with confidence.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+✨ Key Features (Current MVP)
+Vetted & Curated Spaces: Every space is handpicked and verified for quality and reliability.
+
+Detailed Listings: Beautiful detail pages with photo galleries, amenities, and transparent pricing.
+
+Seamless Discovery: A clean, modern, and fast interface for finding the perfect workspace.
+
+Live Database: All listings are fetched in real-time from a scalable Firestore database.
+
+📸 Screenshot
+(This is a placeholder screenshot. You should update this with a real screenshot of your app!)
+
+🛠️ Tech Stack
+This project is built with a modern, scalable, serverless-first tech stack:
+
+Frontend: React (with Vite)
+
+Styling: Tailwind CSS
+
+Backend & Database: Firebase (Firestore & Authentication)
+
+Deployment: Vercel
+
+⚙️ Getting Started
+To get a local copy up and running, follow these simple steps.
+
+Prerequisites
+You need to have Node.js and npm installed on your machine.
+
+Installation
+Clone the repo
+
+git clone [https://github.com/OlaMarcus09/workspace-africa.git](https://github.com/OlaMarcus09/workspace-africa.git)
+
+Navigate to the project directory
+
+cd workspace-africa
+
+Install NPM packages
+
+npm install
+
+Set up your environment variables
+
+Create a file named .env.local in the root of the project.
+
+Add your Firebase configuration keys:
+
+VITE_API_KEY="YOUR_API_KEY"
+VITE_AUTH_DOMAIN="YOUR_AUTH_DOMAIN"
+VITE_PROJECT_ID="YOUR_PROJECT_ID"
+VITE_STORAGE_BUCKET="YOUR_STORAGE_BUCKET"
+VITE_MESSAGING_SENDER_ID="YOUR_SENDER_ID"
+VITE_APP_ID="YOUR_APP_ID"
+
+Run the development server
+
+npm run dev
+
+🗺️ Project Roadmap
+This project follows a phased implementation based on the official technical specification.
+
+[x] Phase 1: MVP Launch (Current)
+
+[x] User discovery of spaces
+
+[x] Real-time data from Firestore
+
+[ ] User Authentication (Sign Up/Login)
+
+[ ] Payment Integration (Paystack)
+
+[ ] Phase 2: Intelligent Marketplace
+
+[ ] Instant Booking
+
+[ ] Corporate Accounts & Dashboards
+
+[ ] Partner Dashboards
+
+[ ] Phase 3: AI & Scale
+
+[ ] Smart Recommendations
+
+[ ] Predictive Analytics
+
+Built with ❤️ by Olawale Marcus.
