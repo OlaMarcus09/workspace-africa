@@ -1,7 +1,9 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+// Import the new function
+import { getAuth } from "firebase/auth";
 
-// Your web app's Firebase configuration, securely loaded from environment variables
+// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
   authDomain: import.meta.env.VITE_AUTH_DOMAIN,
@@ -14,7 +16,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Cloud Firestore and export it for use in other components
+// Initialize and export our services
 const db = getFirestore(app);
+const auth = getAuth(app); // Our new auth service
 
-export { db };
+export { db, auth };
